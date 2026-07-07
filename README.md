@@ -33,8 +33,9 @@ dangerous," but exactly what will happen if you proceed.
 Early and under active daily development. See [`ROADMAP.md`](./ROADMAP.md)
 and [`docs/plan.md`](./docs/plan.md) for where this is headed and why.
 
-Currently supported: command parsing (Sprint 1). Risk rules, repo-context
-inspection, and prediction output are in progress — see the roadmap.
+Currently supported: command parsing and a deterministic risk engine for
+a handful of Git and filesystem commands (see `ROADMAP.md`). Repo-context
+inspection and prediction output are next.
 
 ## Getting started
 
@@ -45,10 +46,30 @@ npm install
 npm run build
 ```
 
-Try the parser directly:
+Check whether a command is risky before you run it:
 
 ```bash
-npm run dev --workspace=apps/cli -- parse git push --force
+node apps/cli/dist/index.js check git push --force
+```
+
+```
+git push --force
+
+Risk: HIGH
+
+This command will:
+  ✓ Rewrites remote history
+  ✓ May overwrite commits pushed by collaborators
+
+Undo:       git reflog (on the machine that had the old history)
+Confidence: 90%
+Rule:       git-force-push
+```
+
+Or just inspect how a command gets parsed:
+
+```bash
+node apps/cli/dist/index.js parse git push --force
 ```
 
 ```json
