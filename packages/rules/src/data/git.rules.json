@@ -1,0 +1,77 @@
+[
+  {
+    "id": "git-force-push",
+    "name": "Force push",
+    "conditions": [
+      { "field": "command", "operator": "equals", "value": "git" },
+      { "field": "subcommand", "operator": "equals", "value": "push" },
+      { "field": "flags", "operator": "includesAny", "value": ["--force", "-f"] }
+    ],
+    "level": "HIGH",
+    "confidence": 90,
+    "effects": ["Rewrites remote history", "May overwrite commits pushed by collaborators"],
+    "undoable": true,
+    "undoHint": "git reflog (on the machine that had the old history)"
+  },
+  {
+    "id": "git-force-push-with-lease",
+    "name": "Force push with lease",
+    "conditions": [
+      { "field": "command", "operator": "equals", "value": "git" },
+      { "field": "subcommand", "operator": "equals", "value": "push" },
+      { "field": "flags", "operator": "includesAny", "value": ["--force-with-lease"] }
+    ],
+    "level": "MEDIUM",
+    "confidence": 85,
+    "effects": [
+      "Rewrites remote history",
+      "Refuses to overwrite if the remote has commits you haven't seen yet"
+    ],
+    "undoable": true,
+    "undoHint": "git reflog (on the machine that had the old history)"
+  },
+  {
+    "id": "git-hard-reset",
+    "name": "Hard reset",
+    "conditions": [
+      { "field": "command", "operator": "equals", "value": "git" },
+      { "field": "subcommand", "operator": "equals", "value": "reset" },
+      { "field": "flags", "operator": "includesAny", "value": ["--hard"] }
+    ],
+    "level": "HIGH",
+    "confidence": 90,
+    "effects": [
+      "Discards uncommitted changes in tracked files",
+      "Moves the branch pointer, potentially dropping unreachable commits"
+    ],
+    "undoable": true,
+    "undoHint": "git reflog, but uncommitted working-tree changes are gone for good"
+  },
+  {
+    "id": "git-branch-force-delete",
+    "name": "Force-delete branch",
+    "conditions": [
+      { "field": "command", "operator": "equals", "value": "git" },
+      { "field": "subcommand", "operator": "equals", "value": "branch" },
+      { "field": "flags", "operator": "includesAny", "value": ["-D", "--delete-force"] }
+    ],
+    "level": "MEDIUM",
+    "confidence": 80,
+    "effects": ["Deletes the branch even if it has unmerged commits"],
+    "undoable": true,
+    "undoHint": "git reflog, if you know the branch's last commit hash"
+  },
+  {
+    "id": "git-clean-force",
+    "name": "Force clean untracked files",
+    "conditions": [
+      { "field": "command", "operator": "equals", "value": "git" },
+      { "field": "subcommand", "operator": "equals", "value": "clean" },
+      { "field": "flags", "operator": "includesAny", "value": ["-f", "-fd", "-fdx"] }
+    ],
+    "level": "HIGH",
+    "confidence": 85,
+    "effects": ["Permanently deletes untracked files", "Not recoverable via git reflog"],
+    "undoable": false
+  }
+]

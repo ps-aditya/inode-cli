@@ -1,0 +1,33 @@
+[
+  {
+    "id": "fs-rm-recursive-force",
+    "name": "Recursive forced delete",
+    "conditions": [
+      { "field": "command", "operator": "equals", "value": "rm" },
+      {
+        "field": "flags",
+        "operator": "matches",
+        "value": "^-[a-z]*r[a-z]*f[a-z]*$|^-[a-z]*f[a-z]*r[a-z]*$"
+      }
+    ],
+    "level": "CRITICAL",
+    "confidence": 95,
+    "effects": [
+      "Permanently deletes the target and everything inside it",
+      "No trash/recycle bin — deletion bypasses the filesystem's undo entirely"
+    ],
+    "undoable": false
+  },
+  {
+    "id": "fs-rm-force",
+    "name": "Forced delete",
+    "conditions": [
+      { "field": "command", "operator": "equals", "value": "rm" },
+      { "field": "flags", "operator": "matches", "value": "^-f$|^--force$" }
+    ],
+    "level": "HIGH",
+    "confidence": 85,
+    "effects": ["Deletes the target without confirmation, even if write-protected"],
+    "undoable": false
+  }
+]

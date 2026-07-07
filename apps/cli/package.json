@@ -13,6 +13,7 @@
   "dependencies": {
     "@tra/shared": "*",
     "@tra/parser": "*",
+    "@tra/rules": "*",
     "chalk": "^4.1.2",
     "boxen": "^5.1.2",
     "commander": "^12.1.0",

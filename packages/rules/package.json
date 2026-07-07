@@ -9,5 +9,8 @@
   },
   "dependencies": {
     "@tra/shared": "*"
+  },
+  "devDependencies": {
+    "@tra/parser": "*"
   }
 }
