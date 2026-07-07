@@ -63,5 +63,22 @@ export function getContributorsBetween(
   return Array.from(new Set(emails));
 }
 
+/**
+ * Returns the upstream tracking ref for HEAD (e.g. "origin/main"), or
+ * null if none is configured. Exposed separately from
+ * collectRepoContext() because the predictor needs the ref itself (to
+ * diff against), not just the ahead/behind counts derived from it.
+ */
+export function getUpstreamRef(cwd: string = process.cwd()): string | null {
+  return tryGit(['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], cwd);
+}
+
+/** Returns how many files have uncommitted changes (tracked or untracked). */
+export function getUncommittedFileCount(cwd: string = process.cwd()): number {
+  const output = tryGit(['status', '--porcelain'], cwd);
+  if (!output) return 0;
+  return output.split('\n').filter((line) => line.length > 0).length;
+}
+
 export { isProtectedBranchName } from './protectedBranches';
 export type { RepoContext } from '@inode/shared';

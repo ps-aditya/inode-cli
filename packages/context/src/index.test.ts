@@ -3,7 +3,13 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { collectRepoContext, getContributorsBetween, isProtectedBranchName } from './index';
+import {
+  collectRepoContext,
+  getContributorsBetween,
+  getUncommittedFileCount,
+  getUpstreamRef,
+  isProtectedBranchName,
+} from './index';
 
 function run(args: string[], cwd: string): void {
   execFileSync('git', args, { cwd, stdio: 'ignore' });
@@ -109,6 +115,49 @@ describe('isProtectedBranchName', () => {
   it('does not flag feature branches', () => {
     expect(isProtectedBranchName('feature/new-thing')).toBe(false);
     expect(isProtectedBranchName('chore/cleanup')).toBe(false);
+  });
+});
+
+describe('getUpstreamRef / getUncommittedFileCount', () => {
+  let dir: string;
+
+  beforeEach(() => {
+    dir = mkdtempSync(join(tmpdir(), 'inode-context-helpers-'));
+  });
+
+  afterEach(() => {
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('returns null upstream when none is configured', () => {
+    initRepo(dir, 'main');
+    commit(dir, 'a.txt', 'hello', 'init');
+    expect(getUpstreamRef(dir)).toBeNull();
+  });
+
+  it('returns the upstream ref once one is configured', () => {
+    const bareDir = mkdtempSync(join(tmpdir(), 'inode-bare-helpers-'));
+    try {
+      run(['init', '-q', '--bare', '-b', 'main'], bareDir);
+      initRepo(dir, 'main');
+      commit(dir, 'a.txt', 'hello', 'init');
+      run(['remote', 'add', 'origin', bareDir], dir);
+      run(['push', '-q', '-u', 'origin', 'main'], dir);
+
+      expect(getUpstreamRef(dir)).toBe('origin/main');
+    } finally {
+      rmSync(bareDir, { recursive: true, force: true });
+    }
+  });
+
+  it('counts uncommitted files, including untracked ones', () => {
+    initRepo(dir, 'main');
+    commit(dir, 'a.txt', 'hello', 'init');
+    expect(getUncommittedFileCount(dir)).toBe(0);
+
+    writeFileSync(join(dir, 'a.txt'), 'changed');
+    writeFileSync(join(dir, 'new-file.txt'), 'new');
+    expect(getUncommittedFileCount(dir)).toBe(2);
   });
 });
 
