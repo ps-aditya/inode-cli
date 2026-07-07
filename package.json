@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspace=packages/shared && npm run build --workspace=packages/parser --workspace=packages/rules --workspace=packages/predictor --workspace=packages/output --if-present && npm run build --workspace=apps/cli",
+    "build": "npm run build --workspace=packages/shared && npm run build --workspace=packages/parser --workspace=packages/rules --workspace=packages/context --workspace=packages/predictor --workspace=packages/output --if-present && npm run build --workspace=apps/cli",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --ext .ts",

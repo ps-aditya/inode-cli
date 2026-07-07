@@ -14,6 +14,7 @@
     "@inode/shared": "*",
     "@inode/parser": "*",
     "@inode/rules": "*",
+    "@inode/context": "*",
     "chalk": "^4.1.2",
     "boxen": "^5.1.2",
     "commander": "^12.1.0",

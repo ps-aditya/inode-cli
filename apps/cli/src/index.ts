@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import { parseCommand } from '@inode/parser';
 import { assessRisk } from '@inode/rules';
+import { collectRepoContext } from '@inode/context';
 
 const program = new Command();
 
@@ -47,6 +48,14 @@ program
     if (assessment.matchedRule) {
       console.log(`Rule:       ${assessment.matchedRule}`);
     }
+  });
+
+program
+  .command('context')
+  .description('Show what we can detect about the current repo (debug utility for Sprint 3)')
+  .action(() => {
+    const context = collectRepoContext(process.cwd());
+    console.log(JSON.stringify(context, null, 2));
   });
 
 program.parse(process.argv);
