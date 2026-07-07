@@ -27,12 +27,15 @@ product context (objective, success criteria, risks, open questions).
 - [x] Tests per rule
 - [x] Wired into CLI as `tra check <command...>`
 
-## Sprint 3 — Context Engine
+## Sprint 3 — Context Engine ✅ (done)
 
-- [ ] Detect current branch, remote, uncommitted changes
-- [ ] Detect ahead/behind counts
-- [ ] Detect protected branches
-- [ ] Detect number of contributors on affected history
+- [x] Detect current branch, remote, uncommitted changes
+- [x] Detect ahead/behind counts
+- [x] Detect protected branches
+- [x] Detect contributors on affected history (`getContributorsBetween`,
+      ready for the predictor to consume in Sprint 4)
+- [x] Wired into CLI as `inode context` (debug utility)
+- [x] 10 tests against real temporary git repos (not mocked)
 
 ## Sprint 4 — Prediction Engine
 
