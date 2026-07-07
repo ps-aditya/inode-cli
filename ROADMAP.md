@@ -37,12 +37,17 @@ product context (objective, success criteria, risks, open questions).
 - [x] Wired into CLI as `inode context` (debug utility)
 - [x] 10 tests against real temporary git repos (not mocked)
 
-## Sprint 4 — Prediction Engine
+## Sprint 4 — Prediction Engine ✅ (done)
 
-- [ ] Combine rule output + repo context into concrete predictions
-      ("this will affect 2 collaborators", not "this is dangerous")
-- [ ] Undo detection (e.g. `git reflog` availability)
-- [ ] Confidence scoring
+- [x] Combine rule output + repo context into concrete predictions
+      ("this will affect 1 collaborator", not "this is dangerous")
+- [x] Undo detection (reuses rule-level `undoHint`, e.g. `git reflog`)
+- [x] Confidence scoring (raised when upstream data is available,
+      lowered when it isn't)
+- [x] Wired into CLI: `inode check` now runs the full
+      parse → rules → predict pipeline via `analyzeCommand()`
+- [x] 8 tests against real temp repos, including a bare "remote" plus
+      a second clone simulating a collaborator's unpulled commits
 
 ## Output Formatter (parallel track)
 

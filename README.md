@@ -33,9 +33,10 @@ dangerous," but exactly what will happen if you proceed.
 Early and under active daily development. See [`ROADMAP.md`](./ROADMAP.md)
 and [`docs/plan.md`](./docs/plan.md) for where this is headed and why.
 
-Currently supported: command parsing and a deterministic risk engine for
-a handful of Git and filesystem commands (see `ROADMAP.md`). Repo-context
-inspection and prediction output are next.
+Currently supported: the full pipeline — parsing, a deterministic risk
+engine, repo-context inspection, and prediction — for a handful of Git
+and filesystem commands (see `ROADMAP.md`). `inode check` combines all of
+it, so the example above reflects real output, not just the design goal.
 
 ## Getting started
 
