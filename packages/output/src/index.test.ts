@@ -111,4 +111,24 @@ describe('renderAssessment', () => {
     expect(output).toContain('…');
     expect(output).not.toContain('x'.repeat(150)); // full unbounded title never reaches boxen
   });
+
+  // Regression test: found during end-to-end QA. The git-hard-reset
+  // rule's real undoHint ("git reflog, but uncommitted working-tree
+  // changes are gone for good") is 68+ chars and hit the exact same
+  // boxen collapse bug, because the undo line wasn't wrapped like the
+  // effect lines were. Guards against ever un-wrapping it again.
+  it('keeps proper multi-line output when the undo hint is long', () => {
+    const assessment: RiskAssessment = {
+      level: 'HIGH',
+      confidence: 90,
+      effects: [{ description: 'Discards uncommitted changes in tracked files' }],
+      undoable: true,
+      undoHint: 'git reflog, but uncommitted working-tree changes are gone for good',
+      matchedRule: 'git-hard-reset',
+    };
+    const output = renderAssessment('git reset --hard HEAD', assessment);
+    const lineCount = output.split('\n').length;
+    expect(lineCount).toBeGreaterThan(8);
+    expect(output).toContain('gone for good');
+  });
 });

@@ -90,7 +90,8 @@ export function renderAssessment(raw: string, assessment: RiskAssessment): strin
 
   const undoText = assessment.undoable ? (assessment.undoHint ?? 'Possible') : 'Not possible';
   const undoColor = assessment.undoable ? chalk.green : chalk.red;
-  lines.push(`Undo:       ${undoColor(undoText)}`);
+  const undoLines = wrapLine('Undo:       ', undoText, CONTENT_MAX_WIDTH);
+  lines.push(...undoLines.map((line) => undoColor(line)));
   lines.push(`Confidence: ${assessment.confidence}%`);
   if (assessment.matchedRule) {
     lines.push(chalk.dim(`Rule:       ${assessment.matchedRule}`));
