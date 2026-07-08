@@ -54,5 +54,15 @@ export function assessRisk(command: ParsedCommand, ruleSet: RuleSet = allRules):
   return toAssessment(highestSeverity);
 }
 
+/**
+ * Looks up a rule by id — used by `inode check --explain` to show why a
+ * command was flagged, after the fact (RiskAssessment only carries the
+ * id, not the full rule, to keep that type small and serializable).
+ */
+export function getRuleById(id: string, ruleSet: RuleSet = allRules): Rule | undefined {
+  return ruleSet.find((rule) => rule.id === id);
+}
+
 export { matchRules, evaluateRule } from './matcher';
+export { describeRule, describeCondition } from './describe';
 export type { Rule, RuleCondition, RuleSet } from './types';

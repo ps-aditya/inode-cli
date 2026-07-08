@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseCommand } from '@inode/parser';
-import { assessRisk } from './index';
+import { assessRisk, describeRule, getRuleById } from './index';
 
 describe('assessRisk', () => {
   it('flags git push --force as HIGH', () => {
@@ -51,5 +51,33 @@ describe('assessRisk', () => {
   it('does not flag a plain git push (no force)', () => {
     const result = assessRisk(parseCommand('git push origin main'));
     expect(result.level).toBe('LOW');
+  });
+});
+
+describe('getRuleById', () => {
+  it('finds a rule by its id', () => {
+    const rule = getRuleById('git-force-push');
+    expect(rule).toBeDefined();
+    expect(rule?.name).toBe('Force push');
+  });
+
+  it('returns undefined for an unknown id', () => {
+    expect(getRuleById('not-a-real-rule')).toBeUndefined();
+  });
+});
+
+describe('describeRule', () => {
+  it('explains every condition that had to match', () => {
+    const rule = getRuleById('git-force-push');
+    expect(rule).toBeDefined();
+    const lines = describeRule(rule!);
+
+    expect(lines[0]).toContain('git-force-push');
+    expect(lines[0]).toContain('Force push');
+    expect(lines.some((line) => line.includes('command equals "git"'))).toBe(true);
+    expect(lines.some((line) => line.includes('subcommand equals "push"'))).toBe(true);
+    expect(lines.some((line) => line.includes('includes any of') && line.includes('--force'))).toBe(
+      true,
+    );
   });
 });
