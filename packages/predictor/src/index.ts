@@ -22,15 +22,17 @@ function pluralize(count: number, noun: string): string {
  *
  * No AI here either — every number comes from a git command.
  *
- * IMPORTANT CAVEAT: ahead/behind counts and collaborator counts are
- * computed from the local remote-tracking ref (e.g. `origin/main`),
- * which is only as fresh as your last `git fetch`/`git pull`. If a
- * collaborator pushed moments ago and you haven't fetched, this will
- * under-report the real impact. We deliberately do NOT auto-fetch here
- * — that would add a network call and latency to what's meant to be a
- * fast, offline-capable check (see the <100ms success criterion). This
- * tradeoff (speed vs. freshness) is worth revisiting if it causes real
- * near-misses in practice.
+ * IMPORTANT CAVEAT (now surfaced directly to the user, not just here):
+ * ahead/behind counts and collaborator counts are computed from the
+ * local remote-tracking ref (e.g. `origin/main`), which is only as
+ * fresh as your last `git fetch`/`git pull`. If a collaborator pushed
+ * moments ago and you haven't fetched, this will under-report the real
+ * impact. We deliberately do NOT auto-fetch here — that would add a
+ * network call and latency to what's meant to be a fast, offline-capable
+ * check (see the <100ms success criterion) — so instead we say plainly,
+ * in the output itself, that the numbers reflect the last fetch. This
+ * tradeoff (speed vs. freshness) is worth revisiting if silent staleness
+ * ever causes a real near-miss in practice.
  */
 export function predict(
   command: ParsedCommand,
@@ -86,7 +88,16 @@ export function predict(
             description: `Affects ${pluralize(contributors.length, 'collaborator')}`,
           });
         }
-        confidence = Math.min(99, confidence + 9);
+        // Deliberately NOT boosting confidence here just because an
+        // upstream ref exists. Found in QA: this previously reported the
+        // same 99% confidence whether or not the local remote-tracking
+        // data was fresh, silently under-reporting real impact right
+        // after a collaborator pushed and before a fetch. Confidence
+        // should reflect what we actually know, and we genuinely don't
+        // know how stale this is — so we say so instead of hiding it.
+        effects.push({
+          description: `Numbers reflect your last fetch of ${upstream} — run "git fetch" first to be sure this is current`,
+        });
       } else {
         effects.push({
           description: 'No upstream tracking branch found — remote impact could not be measured',

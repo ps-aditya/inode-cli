@@ -114,7 +114,12 @@ describe('predict', () => {
     expect(descriptions).toContain('Rewrites remote history');
     expect(descriptions).toContain('Replaces 2 commits on the remote');
     expect(descriptions).toContain('Affects 1 collaborator');
-    expect(result.confidence).toBeGreaterThan(base.confidence);
+    // Confidence should NOT be artificially boosted just because we found
+    // an upstream ref — found in QA that this previously hid staleness
+    // behind a falsely high number. Instead, a plain-language caveat
+    // about fetch freshness should be present.
+    expect(result.confidence).toBe(base.confidence);
+    expect(descriptions.some((d) => d.includes('last fetch'))).toBe(true);
   });
 
   it('escalates to CRITICAL on a protected branch', () => {
@@ -132,6 +137,47 @@ describe('predict', () => {
     expect(result.effects.map((e) => e.description)).toContain(
       'This is your protected branch (main)',
     );
+  });
+
+  // Regression test: found during end-to-end QA. Before fetching, a
+  // collaborator's remote-side commits are invisible to git locally, so
+  // "Replaces N commits" / "Affects N collaborators" correctly don't
+  // appear yet — but confidence still reported the same 99% as after
+  // fetching, silently implying full certainty about a partial picture.
+  // Guards against ever reintroducing that confidence boost.
+  it('does not report inflated confidence when remote data may be stale (pre-fetch)', () => {
+    initRepo(dir, 'main');
+    commitAs(dir, 'a.txt', '1', 'shared history');
+    run(['remote', 'add', 'origin', bareDir], dir);
+    run(['push', '-q', '-u', 'origin', 'main'], dir);
+
+    // A collaborator pushes commits directly to the bare remote. We
+    // deliberately do NOT fetch before checking — this is the exact
+    // "about to force-push without having fetched" scenario.
+    const cloneDir = mkdtempSync(join(tmpdir(), 'inode-predict-stale-clone-'));
+    try {
+      run(['clone', '-q', bareDir, cloneDir], tmpdir());
+      commitAs(cloneDir, 'c.txt', '1', 'a commit we have not fetched', {
+        email: 'carol@example.com',
+        name: 'Carol',
+      });
+      run(['push', '-q'], cloneDir);
+    } finally {
+      rmSync(cloneDir, { recursive: true, force: true });
+    }
+
+    const command = parseCommand('git push --force');
+    const base = assessRisk(command);
+    const result = predict(command, base, dir);
+    const descriptions = result.effects.map((e) => e.description);
+
+    // We haven't fetched, so we genuinely can't see Carol's commit yet —
+    // that's expected and fine. What matters is confidence isn't
+    // artificially inflated, and the freshness caveat is present so the
+    // person knows this picture might be incomplete.
+    expect(descriptions).not.toContain('Affects 1 collaborator');
+    expect(result.confidence).toBe(base.confidence);
+    expect(descriptions.some((d) => d.includes('last fetch'))).toBe(true);
   });
 
   it('reports the number of uncommitted files for a hard reset', () => {
