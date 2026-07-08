@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import { parseCommand } from '@inode/parser';
 import { collectRepoContext } from '@inode/context';
 import { analyzeCommand } from '@inode/predictor';
+import { renderAssessment } from '@inode/output';
 
 const program = new Command();
 
@@ -28,25 +29,7 @@ program
   .action((commandParts: string[]) => {
     const raw = commandParts.join(' ');
     const assessment = analyzeCommand(raw, process.cwd());
-
-    if (assessment.level === 'LOW') {
-      console.log(`✓ ${raw} — looks safe (no rule matched)`);
-      return;
-    }
-
-    console.log(`\n${raw}\n`);
-    console.log(`Risk: ${assessment.level}`);
-    console.log('\nThis command will:');
-    for (const effect of assessment.effects) {
-      console.log(`  ✓ ${effect.description}`);
-    }
-    console.log(
-      `\nUndo:       ${assessment.undoable ? (assessment.undoHint ?? 'Possible') : 'Not possible'}`,
-    );
-    console.log(`Confidence: ${assessment.confidence}%`);
-    if (assessment.matchedRule) {
-      console.log(`Rule:       ${assessment.matchedRule}`);
-    }
+    console.log(renderAssessment(raw, assessment));
   });
 
 program

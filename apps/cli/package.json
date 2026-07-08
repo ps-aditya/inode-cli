@@ -15,6 +15,7 @@
     "@inode/parser": "*",
     "@inode/context": "*",
     "@inode/predictor": "*",
+    "@inode/output": "*",
     "chalk": "^4.1.2",
     "boxen": "^5.1.2",
     "commander": "^12.1.0",

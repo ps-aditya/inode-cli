@@ -8,6 +8,8 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@inode/shared": "*"
+    "@inode/shared": "*",
+    "chalk": "^4.1.2",
+    "boxen": "^5.1.2"
   }
 }
