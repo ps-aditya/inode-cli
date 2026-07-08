@@ -63,7 +63,13 @@ product context (objective, success criteria, risks, open questions).
 
 ## Launch
 
-- [ ] Support the first 5 Git commands end-to-end
+- [x] Support the first 5 Git commands end-to-end — verified with real
+      multi-collaborator repos (bare remote + 3 clones): `git push
+    --force`/`--force-with-lease`, `git reset --hard`, `git branch
+    -D`, `git clean -f`/`-fd`/`-fdx`, plus `rm -rf`/`rm -f`. Found
+      and fixed 2 real bugs in the process (see commits 918a708,
+      31a9e0a) — a box-rendering collapse on long undo hints, and a
+      confidence score that didn't honestly reflect fetch staleness
 - [ ] README with GIF demo
 - [ ] Public GitHub launch
 
