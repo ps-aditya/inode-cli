@@ -13,7 +13,7 @@ raw command string
         ↓
   packages/predictor     → combines base RiskAssessment + RepoContext → final RiskAssessment
         ↓
-  packages/output        → renders RiskAssessment to the terminal (chalk/boxen/ora)
+  packages/output        → renders RiskAssessment to the terminal (chalk only)
 ```
 
 ## Design principles
@@ -31,6 +31,17 @@ raw command string
 4. **Small surface area first.** Supporting five Git commands extremely well
    beats supporting fifty shallowly. See `docs/plan.md` for what's
    deliberately deferred.
+5. **Extension, not replacement — currently 100% manual, by design.**
+   `inode check <command>` is a separate command you run yourself. It does
+   not hook into your shell, does not intercept real execution, and never
+   blocks anything — nothing is "on hold" while it runs. This was confirmed
+   explicitly after real feedback that the original boxed output _felt_
+   like a blocking gate even though it never was one; the fix was both the
+   visual redesign (single line, no box) and stating this plainly here so
+   it isn't accidentally re-architected into a blocking hook later without
+   a deliberate decision to do so. If shell integration is ever built, it
+   should stay non-blocking and opt-in — see `plan.md`'s open question on
+   this ("Should the product activate automatically or on demand?").
 
 ## Package responsibilities
 

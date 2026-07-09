@@ -49,12 +49,18 @@ product context (objective, success criteria, risks, open questions).
 - [x] 8 tests against real temp repos, including a bare "remote" plus
       a second clone simulating a collaborator's unpulled commits
 
-## Output Formatter ✅ (done)
+## Output Formatter ✅ (done, redesigned once based on real feedback)
 
-- [x] Render `RiskAssessment` with chalk/boxen — color-coded by risk
-      level (green/yellow/red/magenta), boxed panel for anything above
-      LOW, quiet single line for LOW risk (per the manifesto's
-      "prefer silence over noise")
+- [x] ~~Render `RiskAssessment` with chalk/boxen — boxed panel for
+      anything above LOW~~ — **replaced.** First real feedback: the
+      boxen panel read as disruptive/blocking even though `inode
+    check` never actually intercepts or holds up execution — it's a
+      manual side-tool the user runs themselves. The visual weight
+      didn't match that. Redesigned to a single colored line per
+      command (chalk only, no boxen/ora — both removed as
+      dependencies, unused). LOW risk stays exactly as quiet as
+      before; MEDIUM/HIGH/CRITICAL now read as one glanceable line
+      with icon + level + effects + undo + confidence, no borders.
 - [x] Wired into CLI: `inode check` now uses `renderAssessment()`
       instead of manual `console.log` formatting
 - [x] `--explain` flag to show which rule matched and why — prints the
@@ -65,8 +71,8 @@ product context (objective, success criteria, risks, open questions).
 
 - [x] Support the first 5 Git commands end-to-end — verified with real
       multi-collaborator repos (bare remote + 3 clones): `git push
-    --force`/`--force-with-lease`, `git reset --hard`, `git branch
-    -D`, `git clean -f`/`-fd`/`-fdx`, plus `rm -rf`/`rm -f`. Found
+--force`/`--force-with-lease`, `git reset --hard`, `git branch
+-D`, `git clean -f`/`-fd`/`-fdx`, plus `rm -rf`/`rm -f`. Found
       and fixed 2 real bugs in the process (see commits 918a708,
       31a9e0a) — a box-rendering collapse on long undo hints, and a
       confidence score that didn't honestly reflect fetch staleness
